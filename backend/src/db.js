@@ -1,12 +1,15 @@
 import pkg from 'pg';
-const { Pool } = pkg;
 import dotenv from 'dotenv';
 dotenv.config();
 
-// 🔧 Corrige URLs com parâmetros codificados (orddien%262026 → ordien&2026)
+const { Pool } = pkg;
+
+// 🔥 Força o Node a aceitar certificados autoassinados globalmente
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+// Corrige caso a senha tenha & codificado
 const connectionString = process.env.DATABASE_URL.replace('%26', '&');
 
-// 🔥 Cria pool com SSL manualmente forçado
 const pool = new Pool({
   connectionString,
   ssl: {
@@ -16,7 +19,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  console.log('✅ Conectado ao banco PostgreSQL com SSL ignorando certificado');
+  console.log('✅ Conectado ao banco PostgreSQL (SSL ignorando certificado)');
 });
 
 pool.on('error', (err) => {
