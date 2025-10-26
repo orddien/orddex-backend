@@ -4,22 +4,21 @@ dotenv.config();
 
 const { Pool } = pkg;
 
-// 🔥 Força o Node a aceitar certificados autoassinados globalmente
+// 🔥 Aceita SSL autoassinado (necessário para Supabase no Render)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// Corrige caso a senha tenha & codificado
-const connectionString = process.env.DATABASE_URL.replace('%26', '&');
-
 const pool = new Pool({
-  connectionString,
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     require: true,
     rejectUnauthorized: false,
   },
+  keepAlive: true,
+  connectionTimeoutMillis: 10000,
 });
 
 pool.on('connect', () => {
-  console.log('✅ Conectado ao banco PostgreSQL (SSL ignorando certificado)');
+  console.log('✅ Conectado ao banco PostgreSQL (SSL ativo)');
 });
 
 pool.on('error', (err) => {
