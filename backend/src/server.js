@@ -12,7 +12,19 @@ import checkoutRoute from './routes/checkout.js';
 import webhookPushinPayRoute from './routes/webhook-pushinpay.js';
 
 const app = express();
-app.use(cors({ origin: (process.env.CORS_ORIGIN || '*').split(',') }));
+app.use(
+  cors({
+    origin: [
+      "https://orddex.site",
+      "https://www.orddex.site",
+      "https://orddex-frontend.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use(bodyParser.json({ limit: '1mb' }));
 
 app.get('/health', (_, res) => res.json({ ok: true }));
