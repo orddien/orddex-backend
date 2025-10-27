@@ -5,11 +5,11 @@ dotenv.config();
 const { Pool } = pkg;
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const proxy = process.env.PG_PROXY_URL;
-const target = process.env.PG_PROXY_TARGET;
+// URL do proxy (única coisa necessária no backend)
+const proxy = process.env.PG_PROXY_URL || process.env.DATABASE_URL;
 
 const pool = new Pool({
-  connectionString: `${proxy}?target=${target}`,
+  connectionString: proxy,
   ssl: { require: true, rejectUnauthorized: false },
 });
 
