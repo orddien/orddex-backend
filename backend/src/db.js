@@ -5,7 +5,6 @@ dotenv.config();
 const { Pool } = pkg;
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// URL do proxy (ou fallback local)
 const connectionString = process.env.DATABASE_URL || process.env.PG_PROXY_URL;
 
 const pool = new Pool({
