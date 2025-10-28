@@ -14,15 +14,11 @@ import webhookPushinPayRoute from './routes/webhook-pushinpay.js';
 const app = express();
 
 // 🧩 Configurações básicas
-app.use(cors({
-  origin: (process.env.CORS_ORIGIN || '*').split(','),
-}));
+app.use(cors({ origin: (process.env.CORS_ORIGIN || '*').split(',') }));
 app.use(bodyParser.json({ limit: '1mb' }));
 
-// 🩺 Health check (pra testar se o backend tá vivo)
-app.get('/health', (_, res) => {
-  res.json({ ok: true });
-});
+// 🩺 Health check
+app.get('/health', (_, res) => res.json({ ok: true }));
 
 // 🔗 Rotas principais
 authRoutes(app);
@@ -30,29 +26,25 @@ merchantRoutes(app);
 checkoutRoute(app);
 webhookPushinPayRoute(app);
 
-// ⏰ Cron job a cada 30 minutos para expirar assinaturas vencidas
+// ⏰ Cron
 cron.schedule('*/30 * * * *', async () => {
   try {
-    const r = await query(
-      `SELECT id FROM subscriptions WHERE status='active' AND end_at < now()`
-    );
-    for (const row of r.rows) {
+    const r = await query(`SELECT id FROM subscriptions WHERE status='active' AND end_at < now()`);
+    for (const row of r.rows)
       await query(`UPDATE subscriptions SET status='expired' WHERE id=$1`, [row.id]);
-    }
-    console.log('⏳ Cron: assinaturas expiradas atualizadas');
+    console.log('⏳ Cron executado com sucesso');
   } catch (err) {
     console.error('❌ Erro no cron:', err);
   }
 });
 
-// ⚙️ Porta dinâmica para Railway
-const PORT = process.env.PORT || 3000;
+// ⚙️ Porta dinâmica exigida pelo Railway
+const PORT = parseInt(process.env.PORT, 10) || 8080;
 
 // 🚀 Inicializa servidor
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ API Orddex ouvindo na porta ${PORT}`);
 
-  // 🤖 Inicializa bot de forma segura
   if (process.env.BOT_TOKEN) {
     try {
       bot.launch().then(() => console.log('🤖 Bot ON'));
