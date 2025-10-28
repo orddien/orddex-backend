@@ -39,10 +39,10 @@ cron.schedule('*/30 * * * *', async () => {
 });
 
 // ⚙️ Porta dinâmica exigida pelo Railway
-const PORT = parseInt(process.env.PORT, 10) || 8080;
+const PORT = process.env.PORT || 8080;
 
 // 🚀 Inicializa servidor
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`✅ API Orddex ouvindo na porta ${PORT}`);
 
   if (process.env.BOT_TOKEN) {
