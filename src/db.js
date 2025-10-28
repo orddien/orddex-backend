@@ -1,17 +1,23 @@
-import pkg from 'pg';
-import dotenv from 'dotenv';
+import pg from "pg";
+import dotenv from "dotenv";
 dotenv.config();
 
-const { Pool } = pkg;
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const { Pool } = pg;
 
-const pool = new Pool({
+// Conexão PostgreSQL (modo Railway)
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { require: true, rejectUnauthorized: false },
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-pool.on('connect', () => console.log('✅ Conectado ao PostgreSQL (Supabase)'));
-pool.on('error', (err) => console.error('❌ Erro de conexão com o banco:', err));
-
-export const query = (text, params) => pool.query(text, params);
-export default pool;
+export async function query(text, params) {
+  const client = await pool.connect();
+  try {
+    const res = await client.query(text, params);
+    return res;
+  } finally {
+    client.release();
+  }
+}
