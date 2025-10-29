@@ -4,12 +4,21 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// Conexão PostgreSQL (modo Railway)
+// ✅ Corrige leitura e garante conexão mesmo com espaços invisíveis
+const connectionString = process.env.DATABASE_URL?.trim();
+
+if (!connectionString) {
+  console.error("❌ DATABASE_URL não definida ou inválida!");
+  process.exit(1);
+}
+
+// ✅ Conexão PostgreSQL (Railway + Supabase)
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: {
-    rejectUnauthorized: false
-  }
+    require: true,
+    rejectUnauthorized: false,
+  },
 });
 
 export async function query(text, params) {
